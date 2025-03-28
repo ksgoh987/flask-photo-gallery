@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="gallery-container">
+  <a href="{{ url_for('logout') }}" class="logout-button">🚪 Logout</a>
   <h1>📸 My Photo Gallery</h1>
 
   <div class="slideshow-with-controls">
@@ -47,6 +48,21 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    position: relative;
+  }
+  .logout-button {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background-color: #c0392b;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .logout-button:hover {
+    background-color: #e74c3c;
   }
   .slideshow-with-controls {
     flex-grow: 1;
