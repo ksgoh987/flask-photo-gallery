@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from datetime import timedelta
 import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a strong secret key
-
+app.permanent_session_lifetime = timedelta(minutes=1)  # Auto logout after 1 minute
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -12,6 +13,7 @@ def login():
         password = request.form['password']
         # Replace this with your actual authentication logic
         if username == 'admin' and password == 'cby4931':
+            session.permanent = True  # This enables auto-expiry
             session['user'] = username
             return redirect(url_for('gallery'))
         else:
