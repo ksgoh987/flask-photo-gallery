@@ -29,6 +29,7 @@
       </label>
     </div>
   </div>
+  <div id="countdown" class="countdown-timer">⏳ Auto-logout in <span id="timer">60</span>s</div>
 </div>
 
 <style>
@@ -141,7 +142,17 @@
   .controls input[type="checkbox"] {
     transform: scale(1.2);
   }
-
+  .countdown-timer {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 200;
+  }
   @media (max-width: 768px) {
     .slideshow-with-controls {
       flex-direction: column;
@@ -255,6 +266,43 @@
       }
     }
   }, false);
+
+  // Countdown timer and auto-logout
+  let countdown = 60;
+  const timerDisplay = document.getElementById('timer');
+  timerDisplay.textContent = countdown;
+
+  let logoutTimer = setInterval(() => {
+    countdown--;
+    if (countdown >= 0) {
+      timerDisplay.textContent = countdown;
+    }
+    if (countdown === 0) {
+      clearInterval(logoutTimer);
+      window.location.href = '/logout';
+    }
+  }, 1000);
+
+  // Reset timer on user interaction
+  function resetLogoutTimer() {
+    clearInterval(logoutTimer);
+    countdown = 60;
+    timerDisplay.textContent = countdown;
+    logoutTimer = setInterval(() => {
+      countdown--;
+      if (countdown >= 0) {
+        timerDisplay.textContent = countdown;
+      }
+      if (countdown === 0) {
+        clearInterval(logoutTimer);
+        window.location.href = '/logout';
+      }
+    }, 1000);
+  }
+
+  ["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetLogoutTimer, false);
+  });
 
   startSlideshow();
 </script>
