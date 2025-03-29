@@ -232,16 +232,27 @@
     if (e.key === 'ArrowRight') nextSlide();
   });
 
-  // Enable touch swipe navigation for mobile
-  let touchStartX = null;
-  document.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-  });
-  document.addEventListener('touchend', e => {
-    const deltaX = e.changedTouches[0].clientX - touchStartX;
-    if (deltaX > 50) prevSlide();
-    else if (deltaX < -50) nextSlide();
-  });
+  // Improved touch swipe detection on slideshow only
+  const slideshow = document.getElementById('slideshow');
+  let startX = 0;
+  let endX = 0;
+
+  slideshow.addEventListener('touchstart', function (e) {
+    startX = e.touches[0].clientX;
+  }, false);
+
+  slideshow.addEventListener('touchend', function (e) {
+    endX = e.changedTouches[0].clientX;
+    const deltaX = endX - startX;
+
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+    }
+  }, false);
 
   startSlideshow();
 </script>
