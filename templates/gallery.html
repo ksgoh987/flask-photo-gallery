@@ -257,6 +257,22 @@
     }
   }, false);
 
+  // Auto logout after 1 minute of no interaction
+  let logoutTimer = setTimeout(() => {
+    window.location.href = "/logout";
+  }, 60000);
+
+  function resetLogoutTimer() {
+    clearTimeout(logoutTimer);
+    logoutTimer = setTimeout(() => {
+      window.location.href = "/logout";
+    }, 60000);
+  }
+
+  ["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetLogoutTimer, false);
+  });
+
   startSlideshow();
 </script>
 {% endblock %}
