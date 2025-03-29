@@ -29,6 +29,8 @@
       </label>
     </div>
   </div>
+
+  <div id="countdown" class="countdown-timer">⏳ Auto-logout in <span id="timer">60</span>s</div>
 </div>
 
 <style>
@@ -141,6 +143,17 @@
   .controls input[type="checkbox"] {
     transform: scale(1.2);
   }
+  .countdown-timer {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 200;
+  }
 
   @media (max-width: 768px) {
     .slideshow-with-controls {
@@ -235,7 +248,6 @@
     if (e.key === 'ArrowRight') nextSlide();
   });
 
-  // Improved touch swipe detection on slideshow only
   const slideshow = document.getElementById('slideshow');
   let startX = 0;
   let endX = 0;
@@ -257,16 +269,32 @@
     }
   }, false);
 
-  // Auto logout after 1 minute of no interaction
-  let logoutTimer = setTimeout(() => {
-    window.location.href = "/logout";
-  }, 60000);
+  // Auto logout after 1 minute of no interaction with countdown
+  let countdown = 60;
+  const timerDisplay = document.getElementById('timer');
+  timerDisplay.textContent = countdown;
+
+  let logoutTimer = setInterval(() => {
+    countdown--;
+    timerDisplay.textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(logoutTimer);
+      window.location.href = "/logout";
+    }
+  }, 1000);
 
   function resetLogoutTimer() {
-    clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(() => {
-      window.location.href = "/logout";
-    }, 60000);
+    clearInterval(logoutTimer);
+    countdown = 60;
+    timerDisplay.textContent = countdown;
+    logoutTimer = setInterval(() => {
+      countdown--;
+      timerDisplay.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(logoutTimer);
+        window.location.href = "/logout";
+      }
+    }, 1000);
   }
 
   ["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
