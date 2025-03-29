@@ -60,6 +60,7 @@
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
+    z-index: 100;
   }
   .logout-button:hover {
     background-color: #e74c3c;
@@ -139,6 +140,33 @@
   }
   .controls input[type="checkbox"] {
     transform: scale(1.2);
+  }
+
+  @media (max-width: 768px) {
+    .slideshow-with-controls {
+      flex-direction: column;
+    }
+    .controls {
+      width: 100%;
+      margin: 0;
+      padding: 10px;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+    .controls select,
+    .controls label,
+    .controls button {
+      font-size: 14px;
+    }
+    .logout-button {
+      top: 10px;
+      right: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
   }
 </style>
 
