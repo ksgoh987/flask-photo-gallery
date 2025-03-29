@@ -38,90 +38,100 @@
 </style>
 
 <script>
-window.onload = function () {
-  const images = document.querySelectorAll('.slideshow img');
-  let current = 0;
-  let interval = null;
-  let speed = parseInt(document.getElementById('speed').value);
-  let isPlaying = true;
+const images = document.querySelectorAll('.slideshow img');
+let current = 0;
+let interval = null;
+let speed = 5000;
+let isPlaying = true;
 
-  function showSlide(index) {
-    images.forEach((img, i) => {
-      img.classList.remove('active');
-    });
-    images[index].classList.add('active');
+function showSlide(index) {
+  images.forEach((img) => img.classList.remove('active'));
+  images[index].classList.add('active');
+}
+
+function nextSlide() {
+  current = (current + 1) % images.length;
+  showSlide(current);
+}
+
+function prevSlide() {
+  current = (current - 1 + images.length) % images.length;
+  showSlide(current);
+}
+
+function startSlideshow() {
+  if (interval) clearInterval(interval);
+  interval = setInterval(() => {
+    if (!document.getElementById('loop').checked && current === images.length - 1) {
+      togglePlayPause();
+      return;
+    }
+    nextSlide();
+  }, speed);
+}
+
+function togglePlayPause() {
+  const btn = document.getElementById('playPauseBtn');
+  if (isPlaying) {
+    clearInterval(interval);
+    btn.textContent = '▶️ Play';
+  } else {
+    startSlideshow();
+    btn.textContent = '⏸️ Pause';
   }
+  isPlaying = !isPlaying;
+}
 
-  function nextSlide() {
-    current = (current + 1) % images.length;
-    showSlide(current);
-  }
+function changeSpeed() {
+  speed = parseInt(document.getElementById('speed').value);
+  if (isPlaying) startSlideshow();
+}
 
-  function prevSlide() {
-    current = (current - 1 + images.length) % images.length;
-    showSlide(current);
-  }
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') prevSlide();
+  if (e.key === 'ArrowRight') nextSlide();
+});
 
-  function startSlideshow() {
-    if (interval) clearInterval(interval);
-    interval = setInterval(() => {
-      if (!document.getElementById('loop').checked && current === images.length - 1) {
-        togglePlayPause();
-        return;
-      }
-      nextSlide();
-    }, speed);
-  }
+const slideshow = document.getElementById('slideshow');
+let startX = 0;
+let endX = 0;
 
-  function togglePlayPause() {
-    const btn = document.getElementById('playPauseBtn');
-    if (isPlaying) {
-      clearInterval(interval);
-      btn.textContent = '▶️ Play';
+slideshow.addEventListener('touchstart', function (e) {
+  startX = e.touches[0].clientX;
+}, false);
+
+slideshow.addEventListener('touchend', function (e) {
+  endX = e.changedTouches[0].clientX;
+  const deltaX = endX - startX;
+
+  if (Math.abs(deltaX) > 50) {
+    if (deltaX > 0) {
+      prevSlide();
     } else {
-      startSlideshow();
-      btn.textContent = '⏸️ Pause';
+      nextSlide();
     }
-    isPlaying = !isPlaying;
   }
+}, false);
 
-  function changeSpeed() {
-    speed = parseInt(document.getElementById('speed').value);
-    if (isPlaying) startSlideshow();
-  }
+// Auto logout with countdown
+let countdown = 60;
+const timerDisplay = document.getElementById('timer');
+timerDisplay.textContent = countdown;
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') prevSlide();
-    if (e.key === 'ArrowRight') nextSlide();
-  });
-
-  const slideshow = document.getElementById('slideshow');
-  let startX = 0;
-  let endX = 0;
-
-  slideshow.addEventListener('touchstart', function (e) {
-    startX = e.touches[0].clientX;
-  }, false);
-
-  slideshow.addEventListener('touchend', function (e) {
-    endX = e.changedTouches[0].clientX;
-    const deltaX = endX - startX;
-
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX > 0) {
-        prevSlide();
-      } else {
-        nextSlide();
-      }
-    }
-  }, false);
-
-  // Auto logout with countdown
-  let countdown = 60;
-  const timerDisplay = document.getElementById('timer');
+let logoutTimer = setInterval(() => {
+  countdown--;
   timerDisplay.textContent = countdown;
+  if (countdown <= 0) {
+    clearInterval(logoutTimer);
+    window.location.href = "/logout";
+  }
+}, 1000);
 
-  let logoutTimer = setInterval(() => {
+function resetLogoutTimer() {
+  clearInterval(logoutTimer);
+  countdown = 60;
+  timerDisplay.textContent = countdown;
+  logoutTimer = setInterval(() => {
     countdown--;
     timerDisplay.textContent = countdown;
     if (countdown <= 0) {
@@ -129,26 +139,15 @@ window.onload = function () {
       window.location.href = "/logout";
     }
   }, 1000);
-
-  function resetLogoutTimer() {
-    clearInterval(logoutTimer);
-    countdown = 60;
-    timerDisplay.textContent = countdown;
-    logoutTimer = setInterval(() => {
-      countdown--;
-      timerDisplay.textContent = countdown;
-      if (countdown <= 0) {
-        clearInterval(logoutTimer);
-        window.location.href = "/logout";
-      }
-    }, 1000);
-  }
-
-  ["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
-    document.addEventListener(evt, resetLogoutTimer, false);
-  });
-
-  startSlideshow();
 }
+
+["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
+  document.addEventListener(evt, resetLogoutTimer, false);
+});
+
+window.onload = function () {
+  speed = parseInt(document.getElementById('speed').value);
+  startSlideshow();
+};
 </script>
 {% endblock %}
