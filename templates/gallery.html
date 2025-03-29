@@ -29,125 +29,233 @@
       </label>
     </div>
   </div>
-
-  <div id="countdown" class="countdown-timer">⏳ Auto-logout in <span id="timer">60</span>s</div>
 </div>
 
 <style>
-  /* [unchanged styles] */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #000;
+    overflow: hidden;
+  }
+  .gallery-container {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+  .logout-button {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background-color: #c0392b;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 100;
+  }
+  .logout-button:hover {
+    background-color: #e74c3c;
+  }
+  .slideshow-with-controls {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+  .slideshow {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .slideshow img {
+    position: absolute;
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+    max-width: 100%;
+    max-height: 100vh;
+    object-fit: contain;
+  }
+  .slideshow img.active {
+    opacity: 1;
+    transform: scale(1);
+    position: relative;
+    z-index: 1;
+  }
+  .nav-buttons {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+  .nav-buttons button {
+    background-color: rgba(0,0,0,0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  .controls {
+    width: 250px;
+    background-color: #111;
+    padding: 20px;
+    border-radius: 10px;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 15px;
+  }
+  .controls button,
+  .controls select,
+  .controls label {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .controls select {
+    background-color: #fff;
+    color: #000;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+  .controls input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+
+  @media (max-width: 768px) {
+    .slideshow-with-controls {
+      flex-direction: column;
+    }
+    .slideshow {
+      height: calc(100vh - 100px);
+    }
+    .controls {
+      width: 100%;
+      margin: 0;
+      padding: 10px;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(0,0,0,0.8);
+      z-index: 20;
+    }
+    .controls select,
+    .controls label,
+    .controls button {
+      font-size: 14px;
+    }
+    .logout-button {
+      top: 10px;
+      right: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+  }
 </style>
 
 <script>
-const images = document.querySelectorAll('.slideshow img');
-let current = 0;
-let interval = null;
-let speed = 5000;
-let isPlaying = true;
+  const images = document.querySelectorAll('.slideshow img');
+  let current = 0;
+  let interval = null;
+  let speed = parseInt(document.getElementById('speed').value);
+  let isPlaying = true;
 
-function showSlide(index) {
-  images.forEach((img) => img.classList.remove('active'));
-  images[index].classList.add('active');
-}
-
-function nextSlide() {
-  current = (current + 1) % images.length;
-  showSlide(current);
-}
-
-function prevSlide() {
-  current = (current - 1 + images.length) % images.length;
-  showSlide(current);
-}
-
-function startSlideshow() {
-  if (interval) clearInterval(interval);
-  interval = setInterval(() => {
-    if (!document.getElementById('loop').checked && current === images.length - 1) {
-      togglePlayPause();
-      return;
-    }
-    nextSlide();
-  }, speed);
-}
-
-function togglePlayPause() {
-  const btn = document.getElementById('playPauseBtn');
-  if (isPlaying) {
-    clearInterval(interval);
-    btn.textContent = '▶️ Play';
-  } else {
-    startSlideshow();
-    btn.textContent = '⏸️ Pause';
+  function showSlide(index) {
+    images.forEach((img, i) => {
+      img.classList.remove('active');
+    });
+    images[index].classList.add('active');
   }
-  isPlaying = !isPlaying;
-}
 
-function changeSpeed() {
-  speed = parseInt(document.getElementById('speed').value);
-  if (isPlaying) startSlideshow();
-}
+  function nextSlide() {
+    current = (current + 1) % images.length;
+    showSlide(current);
+  }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') prevSlide();
-  if (e.key === 'ArrowRight') nextSlide();
-});
+  function prevSlide() {
+    current = (current - 1 + images.length) % images.length;
+    showSlide(current);
+  }
 
-const slideshow = document.getElementById('slideshow');
-let startX = 0;
-let endX = 0;
-
-slideshow.addEventListener('touchstart', function (e) {
-  startX = e.touches[0].clientX;
-}, false);
-
-slideshow.addEventListener('touchend', function (e) {
-  endX = e.changedTouches[0].clientX;
-  const deltaX = endX - startX;
-
-  if (Math.abs(deltaX) > 50) {
-    if (deltaX > 0) {
-      prevSlide();
-    } else {
+  function startSlideshow() {
+    if (interval) clearInterval(interval);
+    interval = setInterval(() => {
+      if (!document.getElementById('loop').checked && current === images.length - 1) {
+        togglePlayPause();
+        return;
+      }
       nextSlide();
-    }
+    }, speed);
   }
-}, false);
 
-// Auto logout with countdown
-let countdown = 60;
-const timerDisplay = document.getElementById('timer');
-timerDisplay.textContent = countdown;
-
-let logoutTimer = setInterval(() => {
-  countdown--;
-  timerDisplay.textContent = countdown;
-  if (countdown <= 0) {
-    clearInterval(logoutTimer);
-    window.location.href = "/logout";
-  }
-}, 1000);
-
-function resetLogoutTimer() {
-  clearInterval(logoutTimer);
-  countdown = 60;
-  timerDisplay.textContent = countdown;
-  logoutTimer = setInterval(() => {
-    countdown--;
-    timerDisplay.textContent = countdown;
-    if (countdown <= 0) {
-      clearInterval(logoutTimer);
-      window.location.href = "/logout";
+  function togglePlayPause() {
+    const btn = document.getElementById('playPauseBtn');
+    if (isPlaying) {
+      clearInterval(interval);
+      btn.textContent = '▶️ Play';
+    } else {
+      startSlideshow();
+      btn.textContent = '⏸️ Pause';
     }
-  }, 1000);
-}
+    isPlaying = !isPlaying;
+  }
 
-["click", "mousemove", "keydown", "touchstart"].forEach(evt => {
-  document.addEventListener(evt, resetLogoutTimer, false);
-});
+  function changeSpeed() {
+    speed = parseInt(document.getElementById('speed').value);
+    if (isPlaying) startSlideshow();
+  }
 
-window.onload = function () {
-  speed = parseInt(document.getElementById('speed').value);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') prevSlide();
+    if (e.key === 'ArrowRight') nextSlide();
+  });
+
+  const slideshow = document.getElementById('slideshow');
+  let startX = 0;
+  let endX = 0;
+
+  slideshow.addEventListener('touchstart', function (e) {
+    startX = e.touches[0].clientX;
+  }, false);
+
+  slideshow.addEventListener('touchend', function (e) {
+    endX = e.changedTouches[0].clientX;
+    const deltaX = endX - startX;
+
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+    }
+  }, false);
+
   startSlideshow();
-};
 </script>
 {% endblock %}
