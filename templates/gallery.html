@@ -232,6 +232,17 @@
     if (e.key === 'ArrowRight') nextSlide();
   });
 
+  // Enable touch swipe navigation for mobile
+  let touchStartX = null;
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  });
+  document.addEventListener('touchend', e => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    if (deltaX > 50) prevSlide();
+    else if (deltaX < -50) nextSlide();
+  });
+
   startSlideshow();
 </script>
 {% endblock %}
