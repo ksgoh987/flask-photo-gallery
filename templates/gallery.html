@@ -4,6 +4,26 @@
   <a href="{{ url_for('logout') }}" class="logout-button">🚪 Logout</a>
   <h1>📸 Welcome, {{ user }}</h1>
 
+  <!-- Background Music -->
+  <audio id="backgroundMusic" loop>
+    <source src="{{ url_for('static', filename='music/background.mp3') }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Music Control Button -->
+  <div style="margin: 10px;">
+    <button onclick="document.getElementById('backgroundMusic').play()" style="
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;">
+      🎵 Play Music
+    </button>
+  </div>
+
   <div class="slideshow-with-controls">
     <div class="slideshow" id="slideshow">
       {% for photo in photos %}
